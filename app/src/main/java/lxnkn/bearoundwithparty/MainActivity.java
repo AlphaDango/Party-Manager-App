@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    public boolean onCreateOptionsMenu(Menu menu) {
+    /*public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }*/
+    @Override
+    public void onBackPressed(){
+        this.finishAffinity();
     }
 
 }
