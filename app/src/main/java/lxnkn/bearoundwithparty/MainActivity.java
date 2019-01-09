@@ -34,26 +34,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    /*public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-    //test
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.login:
-                startActivity(new Intent(this,LoginActivity.class));
-                return true;
-            case R.id.map:
-                startActivity(new Intent(this,MainActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }*/
     @Override
     public void onBackPressed(){
         this.finishAffinity();
