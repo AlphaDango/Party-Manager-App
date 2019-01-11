@@ -22,9 +22,10 @@
     <EditText
         android:id="@+id/benutzernamenFeld"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="51dp"
         android:layout_marginStart="140dp"
         android:layout_marginTop="216dp"
+        android:background="@drawable/edittext_border_color"
         android:ems="10"
         android:inputType="textPersonName"
         android:textColor="@android:color/holo_green_light"
@@ -34,9 +35,10 @@
     <EditText
         android:id="@+id/passwortFeld"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginStart="140dp"
         android:layout_marginTop="316dp"
+        android:background="@drawable/edittext_border_color"
         android:ems="10"
         android:inputType="textPassword"
         android:textColor="@android:color/holo_green_light"
