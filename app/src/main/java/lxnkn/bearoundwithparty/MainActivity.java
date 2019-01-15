@@ -1,40 +1,60 @@
 package lxnkn.bearoundwithparty;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
-import com.here.android.mpa.common.GeoCoordinate;
-import com.here.android.mpa.common.OnEngineInitListener;
-import com.here.android.mpa.mapping.Map;
-import com.here.android.mpa.mapping.MapFragment;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Map map = null;
-    private MapFragment mapFragment = null;
+    private static final String TAG = "MainActivity";
+    private static final int ERROR_DIALOG_REQUEST = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("Be around with Party");
-        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapfragment);
-        mapFragment.init(new OnEngineInitListener() {
-            @Override
-            public void onEngineInitializationCompleted(OnEngineInitListener.Error error) {
-                if (error == OnEngineInitListener.Error.NONE) {
-                    map = mapFragment.getMap();
-                    map.setCenter(new GeoCoordinate(51.805839, 10.356055, 0.0), Map.Animation.NONE);
-                    map.setZoomLevel((map.getMaxZoomLevel()) - 4);
 
-                }
+        if(playServiceCheck()){
+            init();
+        }
+    }
+
+    private void init(){
+        Button btnMap = (Button) findViewById(R.id.btnMap);
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
             }
         });
     }
+
+    public boolean playServiceCheck(){
+        Log.d(TAG, "playServiceCheck: Prüfe Google Play Service Version");
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+        if(available == ConnectionResult.SUCCESS){
+            Log.d(TAG, "playServiceCheck: Google Play Service is verfügbar");
+            return true;
+        }
+        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d(TAG, "playServiceCheck: Ein Fehler ist aufgetreten");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
+            dialog.show();
+        }else{
+            Toast.makeText(this, "Keine Maprequest möglich", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
     @Override
     public void onBackPressed(){
         this.finishAffinity();
