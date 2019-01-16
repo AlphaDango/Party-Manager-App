@@ -4,16 +4,24 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import static lxnkn.bearoundwithparty.util.constants.MAPVIEW_BUNDLE_KEY;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private MapView mMapView;
+    private Calendar kalender = Calendar.getInstance();
+    private SimpleDateFormat zeitformat = new SimpleDateFormat("HH");
+    private int zeit = Integer.parseInt(zeitformat.format(kalender.getTime()));
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +71,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(1, 0)).title("Marker"));
+        if(zeit > 17 || zeit < 7)
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
+        else
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_day));
+        map.addMarker(new MarkerOptions().position(new LatLng(51.805387, 10.346454)).title("VdSt"));
+        map.setMyLocationEnabled(true);
     }
 
     @Override
