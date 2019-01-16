@@ -32,7 +32,7 @@ public class MenuFragment extends Fragment {
                 startActivity(new Intent(getActivity(),LoginActivity.class));
                 return true;
             case R.id.map:
-                startActivity(new Intent(getActivity(),MainActivity.class));
+                startActivity(new Intent(getActivity(),MapActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
