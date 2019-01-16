@@ -1,1 +1,0 @@
-jdbc:mysql://v22018066498968900.bestsrv.de/bearounddb
