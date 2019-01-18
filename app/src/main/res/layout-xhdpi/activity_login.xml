@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/image">
+
+        <Button
+            android:id="@+id/anmeldungButton"
+            android:layout_width="115dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="132dp"
+            android:layout_marginBottom="59dp"
+            android:background="@android:color/holo_orange_dark"
+            android:text="Anmeldung"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/benutzernamenFeld"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="200dp"
+            android:background="@drawable/edittext_border_color"
+            android:drawableBottom="@android:color/holo_red_light"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:textColor="@android:color/holo_green_light"
+            app:layout_constraintStart_toEndOf="@+id/textView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/passwortFeld"
+            android:layout_width="wrap_content"
+            android:layout_height="47dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="300dp"
+            android:background="@drawable/edittext_border_color"
+            android:drawableBottom="@android:color/holo_red_light"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColor="@android:color/holo_green_light"
+            app:layout_constraintStart_toEndOf="@+id/textView2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="98dp"
+            android:layout_height="43dp"
+            android:layout_marginStart="28dp"
+            android:text="Username"
+            android:textColor="@android:color/holo_orange_light"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/benutzernamenFeld" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="102dp"
+            android:layout_height="43dp"
+            android:layout_marginStart="28dp"
+            android:text="Passwort"
+            android:textColor="@android:color/holo_orange_light"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/passwortFeld" />
+
+        <fragment
+            android:id="@+id/fragment"
+            android:name="lxnkn.bearoundwithparty.MenuFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="168dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>
