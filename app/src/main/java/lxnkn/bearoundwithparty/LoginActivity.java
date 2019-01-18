@@ -64,18 +64,7 @@ public class LoginActivity extends AppCompatActivity {
         private String password;
         private ResultSet rs;
         String msg;
-        boolean read_datei = true;
 
-        //Dateieren auslesen
-        {
-            try {
-                in_user = getAssets().open("username.txt");
-                in_pass = getAssets().open("passwort.txt");
-                in_url  = getAssets().open("db_url.txt");
-            } catch (IOException e) {
-                read_datei = false;
-            }
-        }
 
 
         @Override
@@ -83,16 +72,17 @@ public class LoginActivity extends AppCompatActivity {
             username = params[0].trim();
             password = params[1].trim();
 
-            if (read_datei == false) {
-                msg = "Es müssen Dateien für Username, Passwort und DB-URL im Assets-Ordner vorhanden sein";
-                return null;
-            }
-
-            //Daten aus Dateien auslesen für Verbindung zur Datenbank
+            //Dateieren auslesen
             try {
+                in_user = getAssets().open("username.txt");
+                in_pass = getAssets().open("passwort.txt");
+                in_url  = getAssets().open("db_url.txt");
                 USER   = new BufferedReader(new InputStreamReader(in_user)).readLine();
                 PASS   = new BufferedReader(new InputStreamReader(in_pass)).readLine();
                 DB_URL = new BufferedReader(new InputStreamReader(in_url)).readLine();
+                in_pass.close();
+                in_user.close();
+                in_url.close();
             } catch (IOException e) {
                 Log.e("User_read","Es kann keine Daten lesen");
                 msg="Es können keine Daten gelesen werden aus Datei";
