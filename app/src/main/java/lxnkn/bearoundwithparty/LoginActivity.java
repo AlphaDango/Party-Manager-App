@@ -1,5 +1,6 @@
 package lxnkn.bearoundwithparty;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -105,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                     rs = preparedStatement.executeQuery();
                     if (rs.next()) {
                         msg = "Nutzer mit Passwort existiert";
+                        startActivity(new Intent(getBaseContext(), AdminActivity.class));
                     } else {
                         msg = "Nutzer mit Passwort existiert nicht";
                     }
