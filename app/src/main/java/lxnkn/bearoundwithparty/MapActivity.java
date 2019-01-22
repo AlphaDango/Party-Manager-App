@@ -4,32 +4,38 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static lxnkn.bearoundwithparty.util.constants.Icon;
 import static lxnkn.bearoundwithparty.util.constants.Lat;
 import static lxnkn.bearoundwithparty.util.constants.Lng;
 import static lxnkn.bearoundwithparty.util.constants.Locations;
 import static lxnkn.bearoundwithparty.util.constants.MAPVIEW_BUNDLE_KEY;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private MapView mMapView;
     private Calendar kalender = Calendar.getInstance();
     private SimpleDateFormat zeitformat = new SimpleDateFormat("HH");
     private int zeit = Integer.parseInt(zeitformat.format(kalender.getTime()));
-
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         mMapView.onStart();
+
     }
 
     @Override
@@ -88,20 +95,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         return location;
     }
+    public void placeMarkers(){
+        for(int i = 0; i < Locations.length; i++){
+            mMap.addMarker(new MarkerOptions().position(new LatLng(Lat[i], Lng[i])).title(Locations[i]).icon(
+                    BitmapDescriptorFactory.fromResource(Icon[i])
+            ));
+        }
+    }
 
 
     @Override
     public void onMapReady(GoogleMap map) {
+        mMap = map;
         if(zeit > 17 || zeit < 7)
             map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
         else
             map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_day));
-        for(int i = 0; i < Locations.length; i++){
-            map.addMarker(new MarkerOptions().position(new LatLng(Lat[i], Lng[i])).title(Locations[i]));
-        }
+        placeMarkers();
         map.setMyLocationEnabled(true);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(getLocation().getLatitude(), getLocation().getLongitude()), 2));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(getLocation().getLatitude(), getLocation().getLongitude()), (float)14.5));
+
     }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, "Info window clicked",
+                Toast.LENGTH_SHORT).show();
+    }
+
+
 
     @Override
     protected void onPause() {
