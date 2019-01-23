@@ -74,7 +74,11 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
             map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_night));
         else
             map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_day));
-        map.addMarker(new MarkerOptions().position(new LatLng(51.805387, 10.346454)).title("VdSt"));
+
+        InfoWindowData info = new InfoWindowData();
+        CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
+        map.setInfoWindowAdapter(customInfoWindow);
+        map.addMarker(new MarkerOptions().position(new LatLng(51.805387, 10.346454)).title("VdSt")).setTag(info);
         map.setMyLocationEnabled(true);
     }
 
