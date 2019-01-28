@@ -3,6 +3,7 @@ package lxnkn.bearoundwithparty;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.icu.text.IDNA;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,6 +23,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewManager;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -55,13 +62,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ArrayList<String> title = new ArrayList<>();
     private ArrayList<String> ids = new ArrayList<>();
     private ArrayList<ArrayList<String>> partys = new ArrayList<ArrayList<String>>();
+    private TextView verbindung_tv;
+    private TextView party_tv;
+    private TextView date_tv;
+    private TextView time_tv;
+    private TextView label_party;
+    private TextView label_date;
+    private TextView label_time;
+    private View divider;
+    private ViewGroup infoWindow;
+    private ArrayList<String> db_partys = new ArrayList<>();
+    private ArrayList<String> db_datePartys = new ArrayList<>();
+    private ArrayList<String> db_timePartys = new ArrayList<>();
+    private boolean remove_views =false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
@@ -127,6 +146,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         for (int i = 0; i < longitude.size(); i++) {
+
+
             String title_show = "";
             String[] title_parts = title.get(i).split("_");
             if(title_parts.length>1){
@@ -137,38 +158,103 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             else{
                 title_show=title.get(i);
             }
-            boolean is_party = false;
-            InfoWindowData info = new InfoWindowData();
+
+
+            InfoWindowData info  = new InfoWindowData();
+            info.setVerbindung(title_show);
             for(int j=0;j<partys.size();j++){
                 ArrayList<String> party = partys.get(j);
                 if(ids.get(i).equals(party.get(0))){
-                   info.setVerbindung(title_show);
-                   info.setParty(party.get(1));
-                   info.setDateParty(party.get(2));
-                   info.setTimeParty(party.get(3));
-                   is_party=true;
+                    info.addParty(party.get(1));
+                    info.addDateParty(party.get(2));
+                    info.addTimeParty(party.get(3));
                 }
             }
-            if(is_party){
-                CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
-                mMap.setInfoWindowAdapter(customInfoWindow);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(latitude.get(i),longitude.get(i))).title(title_show).icon(
-                        BitmapDescriptorFactory.fromResource(R.raw.marker)
-                )).setTag(info);
-            }else{
-                info.setVerbindung(title_show);
-                CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
-                mMap.setInfoWindowAdapter(customInfoWindow);
-                mMap.addMarker(new MarkerOptions().position(new LatLng(latitude.get(i),longitude.get(i))).title(title_show).icon(
-                        BitmapDescriptorFactory.fromResource(R.raw.marker)
-                )).setTag(info);
-            }
 
 
+            infoWindow = (ViewGroup)getLayoutInflater().inflate(R.layout.map_custom_infowindow,null);
+            verbindung_tv = infoWindow.findViewById(R.id.verbindung);
+            party_tv = infoWindow.findViewById(R.id.name_party);
+            date_tv = infoWindow.findViewById(R.id.date_party);
+            time_tv = infoWindow.findViewById(R.id.time_party);
+            label_party = infoWindow.findViewById(R.id.label_party);
+            label_date = infoWindow.findViewById(R.id.label_date);
+            label_time = infoWindow.findViewById(R.id.label_time);
+            divider = infoWindow.findViewById(R.id.divider);
 
+            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                @Override
+                public View getInfoWindow(Marker marker) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+                    InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
+                    db_partys = infoWindowData.getPartys();
+                    db_datePartys = infoWindowData.getDatePartys();
+                    db_timePartys = infoWindowData.getTimePartys();
+                    verbindung_tv.setText(infoWindowData.getVerbindung());
+
+                    if(db_partys.size() < 1){
+                        if(!remove_views) {
+                            infoWindow.removeView(party_tv);
+                            infoWindow.removeView(date_tv);
+                            infoWindow.removeView(time_tv);
+                            infoWindow.removeView(label_party);
+                            infoWindow.removeView(label_date);
+                            infoWindow.removeView(label_time);
+                            infoWindow.removeView(divider);
+                            remove_views = true;
+                        }
+                    }else {
+                        if (remove_views){
+                            infoWindow.addView(party_tv);
+                            infoWindow.addView(date_tv);
+                            infoWindow.addView(time_tv);
+                            infoWindow.addView(label_party);
+                            infoWindow.addView(label_date);
+                            infoWindow.addView(label_time);
+                            infoWindow.addView(divider);
+                            remove_views =false;
+                        }
+                        party_tv.setText(db_partys.get(0));
+                        date_tv.setText(db_datePartys.get(0));
+                        time_tv.setText(db_timePartys.get(0));
+
+
+                    }
+                    return infoWindow;
+                }
+            });
+
+
+            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+
+                    marker.hideInfoWindow();
+                    InfoWindowData info_neu = new InfoWindowData();
+                    InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
+                    db_partys = infoWindowData.getPartys();
+                    if(db_partys.size()>1){
+                        info_neu = infoWindowData;
+                        info_neu.refresh();
+                        marker.setTag(info_neu);
+                    }
+
+                    marker.showInfoWindow();
+
+                }
+            });
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(latitude.get(i), longitude.get(i))).title(title_show).icon(
+                    BitmapDescriptorFactory.fromResource(R.raw.marker)
+            )).setTag(info);
         }
-
     }
+
+
 
 
     @Override
@@ -267,15 +353,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         rs1 = preparedStatement.executeQuery();
                         rs1.last();
                         if(rs1.getRow()>0){
-                            rs1.first();
-                            ArrayList<String> party=new ArrayList<>();
-                            party.add(id);
-                            party.add(rs1.getString(3));
-                            party.add(rs1.getString(4));
-                            party.add(rs1.getString(5));
-                            partys.add(party);
+                            rs1.beforeFirst();
+                            while(rs1.next()){
+                                ArrayList<String> party=new ArrayList<>();
+                                party.add(id);
+                                String party_name = "";
+                                String[] party_parts = rs1.getString(3).split("_");
+                                if(party_parts.length>1){
+                                    party_name = party_parts[0];
+                                    for(int j=1;j<party_parts.length;j++){
+                                        party_name = party_name+" " +party_parts[j];
+                                    }
+                                }
+                                else{
+                                    party_name=rs1.getString(3);
+                                }
+                                party.add(party_name);
 
+                                String date_party = "";
+                                String[] date_parts = rs1.getString(4).split("-");
+                                for(int j=date_parts.length-1;j>0;j--){
+                                    date_party = date_party+date_parts[j]+".";
+                                }
+                                date_party = date_party+date_parts[0];
+                                party.add(date_party);
 
+                                String time_party = "";
+                                String[] time_parts = rs1.getString(5).split(":");
+                                time_party = time_parts[0]+":"+time_parts[1];
+                                party.add(time_party);
+
+                                partys.add(party);
+                            }
                         }
                     }
                     msg = "Daten von Datenbank geholt";
@@ -291,6 +400,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         protected void onPostExecute(String msg) {
             Log.d("Datei", msg);
         }
+    }
+
+    public static int getPixelsFromDp(Context context, float dp) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int)(dp * scale + 0.5f);
     }
 
 }
