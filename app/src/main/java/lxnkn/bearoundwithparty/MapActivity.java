@@ -1,12 +1,9 @@
 package lxnkn.bearoundwithparty;
 
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -14,8 +11,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.icu.text.IDNA;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -25,8 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -44,10 +36,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
-import static lxnkn.bearoundwithparty.util.constants.Icon;
-import static lxnkn.bearoundwithparty.util.constants.Lat;
-import static lxnkn.bearoundwithparty.util.constants.Lng;
-import static lxnkn.bearoundwithparty.util.constants.Locations;
 import static lxnkn.bearoundwithparty.util.constants.MAPVIEW_BUNDLE_KEY;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
@@ -401,10 +389,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.d("Datei", msg);
         }
     }
-
-    public static int getPixelsFromDp(Context context, float dp) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int)(dp * scale + 0.5f);
-    }
+    
 
 }
