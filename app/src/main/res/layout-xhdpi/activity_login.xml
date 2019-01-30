@@ -21,7 +21,8 @@
             android:text="Anmeldung"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:textAllCaps="false"/>
 
         <EditText
             android:id="@+id/benutzernamenFeld"
