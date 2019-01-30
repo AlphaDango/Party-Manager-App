@@ -69,7 +69,7 @@
 
     <TextView
         android:id="@+id/select_date"
-        android:layout_width="116dp"
+        android:layout_width="70dp"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:text="TextView"
@@ -78,7 +78,7 @@
 
     <TextView
         android:id="@+id/select_time"
-        android:layout_width="113dp"
+        android:layout_width="70dp"
         android:layout_height="46dp"
         android:layout_marginTop="10dp"
         android:text="TextView"
@@ -91,7 +91,8 @@
         android:layout_height="44dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
-        android:text="select Date"
+        android:text="Datum"
+        android:textAllCaps="false"
         app:layout_constraintStart_toEndOf="@+id/select_date"
         app:layout_constraintTop_toBottomOf="@+id/partyname" />
 
@@ -101,8 +102,19 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
-        android:text="Select Time"
+        android:text="Uhrzeit"
+        android:textAllCaps="false"
         app:layout_constraintStart_toEndOf="@+id/select_time"
         app:layout_constraintTop_toBottomOf="@+id/date_party" />
+
+    <Button
+        android:id="@+id/create_party"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Speichern"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toStartOf="@+id/select_time"
+        app:layout_constraintTop_toBottomOf="@+id/btn_time" />
 
 </android.support.constraint.ConstraintLayout>
