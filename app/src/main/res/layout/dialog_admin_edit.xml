@@ -112,6 +112,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@android:color/holo_orange_dark"
         android:text="Speichern"
         android:textAllCaps="false"
         app:layout_constraintStart_toStartOf="@+id/select_time"
