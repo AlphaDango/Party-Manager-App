@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.Rect;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -25,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextClock;
@@ -254,6 +256,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                     AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
                     View view = (AdminActivity.this).getLayoutInflater()
                             .inflate(R.layout.dialog_admin_edit, null);
+
                     TextView standort_party = view.findViewById(R.id.standort_party);
                     InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
                     String verbindung = infoWindowData.getVerbindung();
@@ -308,7 +311,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                                         public void onTimeSet(TimePicker view, int hourOfDay,
                                                               int minute) {
 
-                                            txtTime.setText(hourOfDay + ":" + minute);
+                                            txtTime.setText(hourOfDay + ":" + (minute<10?"0"+minute:minute));
                                         }
                                     }, mHour, mMinute, true);
                             timePickerDialog.show();
