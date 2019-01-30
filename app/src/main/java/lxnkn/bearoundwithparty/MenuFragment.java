@@ -1,5 +1,6 @@
 package lxnkn.bearoundwithparty;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,26 @@ public class MenuFragment extends Fragment {
         inflater.inflate(R.menu.menu, menu);
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if(getActivity().getClass().getName().equals(AdminActivity.class.getName())){
+            MenuItem login = menu.findItem(R.id.login);
+            login.setVisible(false);
+            MenuItem map =menu.findItem(R.id.map);
+            map.setVisible(false);
+            MenuItem logout = menu.findItem(R.id.logout);
+            logout.setVisible(true);
+        }
+        else{
+            MenuItem login = menu.findItem(R.id.login);
+            login.setVisible(true);
+            MenuItem map =menu.findItem(R.id.map);
+            map.setVisible(true);
+            MenuItem logout = menu.findItem(R.id.logout);
+            logout.setVisible(false);
+        }
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.login:
@@ -33,6 +54,10 @@ public class MenuFragment extends Fragment {
                 return true;
             case R.id.map:
                 startActivity(new Intent(getActivity(),MapActivity.class));
+                return true;
+            case R.id.logout:
+                item.setVisible(false);
+                startActivity(new Intent(getActivity(),LoginActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
