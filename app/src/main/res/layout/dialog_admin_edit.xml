@@ -69,16 +69,16 @@
 
     <TextView
         android:id="@+id/select_date"
-        android:layout_width="70dp"
+        android:layout_width="86dp"
         android:layout_height="45dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:text="TextView"
         app:layout_constraintStart_toStartOf="@+id/edit_party"
         app:layout_constraintTop_toBottomOf="@+id/partyname" />
 
     <TextView
         android:id="@+id/select_time"
-        android:layout_width="70dp"
+        android:layout_width="86dp"
         android:layout_height="46dp"
         android:layout_marginTop="10dp"
         android:text="TextView"
@@ -117,5 +117,14 @@
         android:textAllCaps="false"
         app:layout_constraintStart_toStartOf="@+id/select_time"
         app:layout_constraintTop_toBottomOf="@+id/btn_time" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="116dp"
+        app:layout_constraintStart_toEndOf="@+id/time_party"
+        app:layout_constraintTop_toTopOf="@+id/select_time" />
 
 </android.support.constraint.ConstraintLayout>
