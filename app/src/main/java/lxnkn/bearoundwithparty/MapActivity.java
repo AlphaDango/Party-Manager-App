@@ -389,6 +389,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.d("Datei", msg);
         }
     }
-    
+
 
 }
