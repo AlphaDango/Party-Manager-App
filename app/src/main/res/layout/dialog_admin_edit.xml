@@ -127,4 +127,15 @@
         app:layout_constraintStart_toEndOf="@+id/time_party"
         app:layout_constraintTop_toTopOf="@+id/select_time" />
 
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="93dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="10dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Abbruch"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toEndOf="@+id/create_party"
+        app:layout_constraintTop_toTopOf="@+id/create_party" />
+
 </android.support.constraint.ConstraintLayout>
