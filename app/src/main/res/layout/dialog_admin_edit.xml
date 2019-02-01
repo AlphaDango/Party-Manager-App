@@ -128,7 +128,7 @@
         app:layout_constraintTop_toTopOf="@+id/select_time" />
 
     <Button
-        android:id="@+id/cancelButton"
+        android:id="@+id/cancel_button"
         android:layout_width="93dp"
         android:layout_height="49dp"
         android:layout_marginStart="10dp"

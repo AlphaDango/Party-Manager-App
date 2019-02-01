@@ -154,6 +154,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             for(int j=0;j<partys.size();j++){
                 ArrayList<String> party = partys.get(j);
                 if(ids.get(i).equals(party.get(0))){
+                    info.setId(party.get(0));
                     info.addParty(party.get(1));
                     info.addDateParty(party.get(2));
                     info.addTimeParty(party.get(3));

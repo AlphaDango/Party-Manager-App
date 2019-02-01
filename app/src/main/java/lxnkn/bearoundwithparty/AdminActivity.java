@@ -10,11 +10,10 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.graphics.Rect;
+import android.content.DialogInterface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -23,13 +22,11 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextClock;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -47,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 import static lxnkn.bearoundwithparty.util.constants.MAPVIEW_BUNDLE_KEY;
 
@@ -77,6 +75,8 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
     private ArrayList<String> db_datePartys = new ArrayList<>();
     private ArrayList<String> db_timePartys = new ArrayList<>();
     private boolean remove_views =false;
+    private AlertDialog alert2;
+    private AlertDialog alert;
 
 
     @Override
@@ -162,8 +162,9 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
             }
 
 
-            InfoWindowData info  = new InfoWindowData();
+            final InfoWindowData info  = new InfoWindowData();
             info.setVerbindung(title_show);
+            info.setId(ids.get(i));
             for(int j=0;j<partys.size();j++){
                 ArrayList<String> party = partys.get(j);
                 if(ids.get(i).equals(party.get(0))){
@@ -252,17 +253,20 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
 
             mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
                 @Override
-                public void onInfoWindowLongClick(Marker marker) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
+                public void onInfoWindowLongClick(final Marker marker) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
                     View view = (AdminActivity.this).getLayoutInflater()
                             .inflate(R.layout.dialog_admin_edit, null);
 
                     TextView standort_party = view.findViewById(R.id.standort_party);
-                    InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
+                    final InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
                     String verbindung = infoWindowData.getVerbindung();
                     standort_party.setText("Party bei "+verbindung);
                     Button btnDatePicker=view.findViewById(R.id.btn_date);
                     Button btnTimePicker=view.findViewById(R.id.btn_time);
+                    Button btnCreateParty = view.findViewById(R.id.create_party);
+                    Button btnCancelParty = view.findViewById(R.id.cancel_button);
+                    final EditText edit_party = view.findViewById(R.id.edit_party);
                     txtDate=view.findViewById(R.id.select_date);
                     txtTime=view.findViewById(R.id.select_time);
                     SimpleDateFormat datumsformat = new SimpleDateFormat("dd.MM.yyyy");
@@ -317,8 +321,71 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                             timePickerDialog.show();
                         }
                     });
+                    btnCreateParty.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            if(edit_party.getText().toString().trim().isEmpty()){
+                                Toast.makeText(AdminActivity.this,"Bitte einen Partynamen ageben",Toast.LENGTH_SHORT);
+                                return;
+                            }
+                            final AlertDialog.Builder builder2 = new AlertDialog.Builder(AdminActivity.this);
+                            alert2 = builder2.create();
+                            alert.dismiss();
+                            builder2.setMessage("Möchten Sie am "+txtDate.getText().toString()+" um "+txtTime.getText().toString()+
+                            " die Party " +edit_party.getText().toString()+ " bei " +infoWindowData.getVerbindung()+ " planen");
+                            builder2.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    SyncInsertTask syncInsertTask = new SyncInsertTask();
+                                    final String party_name = edit_party.getText().toString();
+                                    final String party_date = txtDate.getText().toString();
+                                    final String party_time = txtTime.getText().toString();
+                                    Object result;
+                                    try {
+                                        result = syncInsertTask.execute(infoWindowData.getId(),party_name,party_date,party_time).get();
+                                    } catch (ExecutionException e) {
+                                        e.printStackTrace();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if(infoWindowData.getPartys().size()<1){
+                                        infoWindowData.addParty(party_name);
+                                        infoWindowData.addDateParty(party_date);
+                                        infoWindowData.addTimeParty(party_time);
+                                    }else{
+                                        int index = infoWindowData.addDateParty(party_date,true);
+                                        infoWindowData.addParty(party_name,index);
+                                        infoWindowData.addTimeParty(party_time,index);
+                                    }
+                                    marker.setTag(infoWindowData);
+                                    marker.hideInfoWindow();
+
+
+                                    alert2.cancel();
+                                }
+                            });
+                            builder2.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Toast.makeText(AdminActivity.this,"Party nicht erstellt",Toast.LENGTH_SHORT).show();
+                                    alert.show();
+                                }
+                            });
+                            alert2 = builder2.create();
+                            alert2.show();
+
+                        }
+                    });
+                    btnCancelParty.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alert.cancel();
+                        }
+                    });
                     builder.setView(view);
-                    builder.show();
+                    alert=builder.create();
+                    alert.show();
 
 
                 }
@@ -474,6 +541,93 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
 
         protected void onPostExecute(String msg) {
             Log.d("Datei", msg);
+        }
+    }
+
+    class SyncInsertTask extends AsyncTask<String, Integer, String> {
+        private String DB_URL;
+        private String USER;
+        private String PASS;
+        private InputStream in_user;
+        private InputStream in_pass;
+        private InputStream in_url;
+        private PreparedStatement preparedStatement;
+        private String statement;
+        private ResultSet rs;
+        private ResultSet rs1;
+        private String id;
+        String msg;
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            String party_id = params[0];
+            String party_name = params[1];
+            String party_date = params[2];
+            String party_time = params[3];
+            //Dateieren auslesen
+            try {
+                in_user = getAssets().open("username.txt");
+                in_pass = getAssets().open("passwort.txt");
+                in_url = getAssets().open("db_url.txt");
+                USER = new BufferedReader(new InputStreamReader(in_user)).readLine();
+                PASS = new BufferedReader(new InputStreamReader(in_pass)).readLine();
+                DB_URL = new BufferedReader(new InputStreamReader(in_url)).readLine();
+                in_pass.close();
+                in_user.close();
+                in_url.close();
+            } catch (IOException e) {
+                Log.e("User_read", "Es kann keine Daten lesen");
+                msg = "Es können keine Daten gelesen werden aus Datei";
+                return null;
+            }
+
+            //Party-Standorte auslesen
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);//Connection Object
+                if (conn == null) {
+                    msg = "Keine Verbindung zur Datenbank möglich";
+                } else {
+                    statement = "INSERT INTO tb_nearby_partys(standort_uid,name,datum,begin_time) VALUES(?,?,?,?)";
+
+                    String[] party_parts = party_name.split(Pattern.quote(" "));
+                    party_name = party_parts[0].trim();
+                    if(party_parts.length>1){
+                        for(int j=1;j<party_parts.length;j++){
+                            if(!(party_parts[j].trim().isEmpty())){
+                                party_name = party_name+"_" +party_parts[j];
+                            }
+                        }
+                    }
+
+                    String[] date_parts = party_date.split(Pattern.quote("."));
+                    party_date="";
+                    for(int j=date_parts.length-1;j>0;j--){
+                        party_date = party_date+date_parts[j]+"-";
+                    }
+                    party_date = party_date+date_parts[0];
+
+                    party_time = party_time+":"+"00";
+
+                    preparedStatement = conn.prepareStatement(statement);
+                    preparedStatement.setString(1,party_id);
+                    preparedStatement.setString(2,party_name);
+                    preparedStatement.setString(3,party_date);
+                    preparedStatement.setString(4,party_time);
+                    preparedStatement.executeUpdate();
+                    msg = "Party erfolgreich in Datenbank eingefügt";
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg = "Fehler beim Einfügen in die Datenbank";
+            }
+            return msg;
+        }
+
+        protected void onPostExecute(String msg) {
+            Toast.makeText(AdminActivity.this,msg,Toast.LENGTH_SHORT).show();
         }
     }
 
