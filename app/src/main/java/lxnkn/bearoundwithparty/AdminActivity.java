@@ -290,7 +290,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                                         public void onDateSet(DatePicker view, int year,
                                                               int monthOfYear, int dayOfMonth) {
 
-                                            txtDate.setText(dayOfMonth + "." + ((monthOfYear + 1)<10?"0"+(monthOfYear + 1):(monthOfYear)) + "." + year);
+                                            txtDate.setText(((dayOfMonth + 1)<10?"0"+(dayOfMonth):(dayOfMonth)) + "." + ((monthOfYear + 1)<10?"0"+(monthOfYear + 1):(monthOfYear+1)) + "." + year);
 
                                         }
                                     }, mYear, mMonth, mDay);
@@ -357,9 +357,13 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                                         int index = infoWindowData.addDateParty(party_date,true);
                                         infoWindowData.addParty(party_name,index);
                                         infoWindowData.addTimeParty(party_time,index);
+                                        for(int i=0;i<index;i++){
+                                            infoWindowData.refresh();
+                                        }
                                     }
-                                    marker.setTag(infoWindowData);
                                     marker.hideInfoWindow();
+                                    marker.setTag(infoWindowData);
+                                    marker.showInfoWindow();
 
 
                                     alert2.cancel();

@@ -22,7 +22,8 @@ public class InfoWindowData {
         if(index>this.timePartys.size()){
             this.timePartys.add(timeParty);
         }else{
-            ArrayList<String> timePartys2 = this.timePartys;
+            ArrayList<String> timePartys2 = new ArrayList<>();
+            timePartys2.addAll(timePartys);
             this.timePartys.set(index,timeParty);
             for(int i = index; i<timePartys2.size()-1;i++){
                 this.timePartys.set(i+1,timePartys2.get(i));
@@ -53,7 +54,8 @@ public class InfoWindowData {
         if(index>this.partys.size()){
             this.partys.add(party);
         }else{
-            ArrayList<String> partys2 = this.partys;
+            ArrayList<String> partys2 = new ArrayList<>();
+            partys2.addAll(partys);
             this.partys.set(index,party);
             for(int i = index; i<partys2.size()-1;i++){
                 this.partys.set(i+1,partys2.get(i));
@@ -83,7 +85,8 @@ public class InfoWindowData {
                 ex2.printStackTrace();
             }
 
-            ArrayList<String> dateParty2 = this.datePartys;
+            ArrayList<String> dateParty2 = new ArrayList<>();
+            dateParty2.addAll(this.datePartys);
             int merke_id =0;
             boolean insert_mittig = false;
             for(int i=0;i<dateParty2.size();i++){
@@ -103,6 +106,23 @@ public class InfoWindowData {
                 this.datePartys.add(dateParty);
                 return datePartys.size();
             }else{
+                boolean date_before = false;
+                for(int i=merke_id;i<dateParty2.size();i++){
+                    Date date1 = new Date();
+                    try {
+                        date1 = sdfToDate.parse(dateParty2.get(i));
+                    } catch (ParseException ex2) {
+                        ex2.printStackTrace();
+                    }
+                    if(date1.before(date_new)){
+                        date_before =true;
+                    }
+                    if(date_before && date_new.before(date1)){
+                        merke_id = i;
+                        break;
+                    }
+                }
+
                 this.datePartys.set(merke_id,dateParty);
                 for(int i = merke_id;i<dateParty2.size()-1;i++){
                     this.datePartys.set(i+1,dateParty2.get(i));

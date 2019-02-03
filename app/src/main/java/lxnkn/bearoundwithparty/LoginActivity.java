@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String msg) {
+
             Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_LONG).show();
             benutzernamenFeld.setEnabled(true);
             passwortFeld.setEnabled(true);
