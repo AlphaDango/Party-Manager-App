@@ -588,9 +588,6 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
         private InputStream in_url;
         private PreparedStatement preparedStatement;
         private String statement;
-        private ResultSet rs;
-        private ResultSet rs1;
-        private String id;
         String msg;
 
 
