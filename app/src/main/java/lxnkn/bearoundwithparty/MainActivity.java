@@ -2,12 +2,14 @@ package lxnkn.bearoundwithparty;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,12 +27,21 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.concurrent.ExecutionException;
+
 import static lxnkn.bearoundwithparty.util.constants.ERROR_DIALOG_REQUEST;
 import static lxnkn.bearoundwithparty.util.constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
 import static lxnkn.bearoundwithparty.util.constants.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "MainActivity";
     boolean mLocationPermissionGranted = false;
 
@@ -40,6 +51,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //warten auf Datenbankabfrage
+        DatabaseAsync syncTask = new DatabaseAsync();
+        Object result;
+        try {
+            result = syncTask.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
@@ -187,5 +210,25 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed(){
         this.finishAffinity();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    class DatabaseAsync extends  AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params){
+            DatabaseClient.getInstance(getBaseContext(),getComponentName().getClassName());
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+        }
+
+    }
+
 
 }

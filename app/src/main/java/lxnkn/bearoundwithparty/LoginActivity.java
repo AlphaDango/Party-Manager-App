@@ -106,7 +106,10 @@ public class LoginActivity extends AppCompatActivity {
                     rs = preparedStatement.executeQuery();
                     if (rs.next()) {
                         msg = "Nutzer mit Passwort existiert";
-                        startActivity(new Intent(getBaseContext(), AdminActivity.class));
+                        String rights = rs.getString(4);
+                        Intent intent = new Intent(getBaseContext(),AdminActivity.class);
+                        intent.putExtra("Rights",rights);
+                        startActivity(intent);
                     } else {
                         msg = "Nutzer mit Passwort existiert nicht";
                     }

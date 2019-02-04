@@ -14,6 +14,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -43,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -59,6 +61,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
     private  ArrayList<Double> longitude = new ArrayList<>();
     private ArrayList<String> title = new ArrayList<>();
     private ArrayList<String> ids = new ArrayList<>();
+    private ArrayList<String> rights = new ArrayList<>();
     private ArrayList<ArrayList<String>> partys = new ArrayList<ArrayList<String>>();
     private TextView verbindung_tv;
     private TextView party_tv;
@@ -86,6 +89,20 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }else{
+            Intent intent = getIntent();
+            String right_string = intent.getStringExtra("Rights");
+            if(!right_string.isEmpty()) {
+                String[] right_parts = right_string.split(",");
+                if (right_parts.length < 1) {
+                    rights.add(right_parts[0]);
+                }else{
+                    for(int i=0;i<right_parts.length;i++){
+                        rights.add(right_parts[i]);
+                    }
+                }
+            }
+
         }
         mMapView = findViewById(R.id.map);
         mMapView.onCreate(mapViewBundle);
@@ -254,143 +271,161 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
             mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
                 @Override
                 public void onInfoWindowLongClick(final Marker marker) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
-                    View view = (AdminActivity.this).getLayoutInflater()
-                            .inflate(R.layout.dialog_admin_edit, null);
-
-                    TextView standort_party = view.findViewById(R.id.standort_party);
                     final InfoWindowData infoWindowData = (InfoWindowData) marker.getTag();
-                    String verbindung = infoWindowData.getVerbindung();
-                    standort_party.setText("Party bei "+verbindung);
-                    Button btnDatePicker=view.findViewById(R.id.btn_date);
-                    Button btnTimePicker=view.findViewById(R.id.btn_time);
-                    Button btnCreateParty = view.findViewById(R.id.create_party);
-                    Button btnCancelParty = view.findViewById(R.id.cancel_button);
-                    final EditText edit_party = view.findViewById(R.id.edit_party);
-                    txtDate=view.findViewById(R.id.select_date);
-                    txtTime=view.findViewById(R.id.select_time);
-                    SimpleDateFormat datumsformat = new SimpleDateFormat("dd.MM.yyyy");
-                    txtDate.setText(datumsformat.format(kalender.getTime()));
-                    txtTime.setText("00:00");
-                    btnDatePicker.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int mYear,mMonth,mDay;
-                            // Get Current Date
-                            final Calendar c = Calendar.getInstance();
-                            mYear = c.get(Calendar.YEAR);
-                            mMonth = c.get(Calendar.MONTH);
-                            mDay = c.get(Calendar.DAY_OF_MONTH);
-
-
-                            DatePickerDialog datePickerDialog = new DatePickerDialog(AdminActivity.this,
-                                    new DatePickerDialog.OnDateSetListener() {
-
-                                        @Override
-                                        public void onDateSet(DatePicker view, int year,
-                                                              int monthOfYear, int dayOfMonth) {
-
-                                            txtDate.setText(((dayOfMonth + 1)<10?"0"+(dayOfMonth):(dayOfMonth)) + "." + ((monthOfYear + 1)<10?"0"+(monthOfYear + 1):(monthOfYear+1)) + "." + year);
-
-                                        }
-                                    }, mYear, mMonth, mDay);
-                            datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
-                            datePickerDialog.show();
+                    boolean create_party = false;
+                    for(int i=0;i<rights.size();i++){
+                        if(infoWindowData.getId().equals(rights.get(i))){
+                            create_party=true;
+                            break;
                         }
-                    });
-                    btnTimePicker.setOnClickListener(new View.OnClickListener() {
-                        int mHour, mMinute;
-                        @Override
-                        public void onClick(View v) {
-                            // Get Current Time
-                            final Calendar c = Calendar.getInstance();
-                            mHour = c.get(Calendar.HOUR_OF_DAY);
-                            mMinute = c.get(Calendar.MINUTE);
+                    }
+                    if(create_party) {
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
+                        View view = (AdminActivity.this).getLayoutInflater()
+                                .inflate(R.layout.dialog_admin_edit, null);
 
-                            // Launch Time Picker Dialog
-                            TimePickerDialog timePickerDialog = new TimePickerDialog(AdminActivity.this,
-                                    new TimePickerDialog.OnTimeSetListener() {
+                        TextView standort_party = view.findViewById(R.id.standort_party);
+                        String verbindung = infoWindowData.getVerbindung();
+                        standort_party.setText("Party bei " + verbindung);
+                        Button btnDatePicker = view.findViewById(R.id.btn_date);
+                        Button btnTimePicker = view.findViewById(R.id.btn_time);
+                        Button btnCreateParty = view.findViewById(R.id.create_party);
+                        Button btnCancelParty = view.findViewById(R.id.cancel_button);
+                        final EditText edit_party = view.findViewById(R.id.edit_party);
+                        txtDate = view.findViewById(R.id.select_date);
+                        txtTime = view.findViewById(R.id.select_time);
+                        SimpleDateFormat datumsformat = new SimpleDateFormat("dd.MM.yyyy");
+                        txtDate.setText(datumsformat.format(kalender.getTime()));
+                        txtTime.setText("00:00");
+                        btnDatePicker.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                int mYear, mMonth, mDay;
+                                // Get Current Date
+                                final Calendar c = Calendar.getInstance();
+                                mYear = c.get(Calendar.YEAR);
+                                mMonth = c.get(Calendar.MONTH);
+                                mDay = c.get(Calendar.DAY_OF_MONTH);
 
-                                        @Override
-                                        public void onTimeSet(TimePicker view, int hourOfDay,
-                                                              int minute) {
 
-                                            txtTime.setText(hourOfDay + ":" + (minute<10?"0"+minute:minute));
-                                        }
-                                    }, mHour, mMinute, true);
-                            timePickerDialog.show();
-                        }
-                    });
-                    btnCreateParty.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                                DatePickerDialog datePickerDialog = new DatePickerDialog(AdminActivity.this,
+                                        new DatePickerDialog.OnDateSetListener() {
 
-                            if(edit_party.getText().toString().trim().isEmpty()){
-                                Toast.makeText(AdminActivity.this,"Bitte einen Partynamen ageben",Toast.LENGTH_SHORT);
-                                return;
+                                            @Override
+                                            public void onDateSet(DatePicker view, int year,
+                                                                  int monthOfYear, int dayOfMonth) {
+
+                                                txtDate.setText(((dayOfMonth + 1) < 10 ? "0" + (dayOfMonth) : (dayOfMonth)) + "." + ((monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : (monthOfYear + 1)) + "." + year);
+
+                                            }
+                                        }, mYear, mMonth, mDay);
+                                datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
+                                datePickerDialog.show();
                             }
-                            final AlertDialog.Builder builder2 = new AlertDialog.Builder(AdminActivity.this);
-                            alert2 = builder2.create();
-                            alert.dismiss();
-                            builder2.setMessage("Möchten Sie am "+txtDate.getText().toString()+" um "+txtTime.getText().toString()+
-                            " die Party " +edit_party.getText().toString()+ " bei " +infoWindowData.getVerbindung()+ " planen");
-                            builder2.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    SyncInsertTask syncInsertTask = new SyncInsertTask();
-                                    final String party_name = edit_party.getText().toString();
-                                    final String party_date = txtDate.getText().toString();
-                                    final String party_time = txtTime.getText().toString();
-                                    Object result;
-                                    try {
-                                        result = syncInsertTask.execute(infoWindowData.getId(),party_name,party_date,party_time).get();
-                                    } catch (ExecutionException e) {
-                                        e.printStackTrace();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    if(infoWindowData.getPartys().size()<1){
-                                        infoWindowData.addParty(party_name);
-                                        infoWindowData.addDateParty(party_date);
-                                        infoWindowData.addTimeParty(party_time);
-                                    }else{
-                                        int index = infoWindowData.addDateParty(party_date,true);
-                                        infoWindowData.addParty(party_name,index);
-                                        infoWindowData.addTimeParty(party_time,index);
-                                        for(int i=0;i<index;i++){
-                                            infoWindowData.refresh();
+                        });
+                        btnTimePicker.setOnClickListener(new View.OnClickListener() {
+                            int mHour, mMinute;
+
+                            @Override
+                            public void onClick(View v) {
+                                // Get Current Time
+                                final Calendar c = Calendar.getInstance();
+                                mHour = c.get(Calendar.HOUR_OF_DAY);
+                                mMinute = c.get(Calendar.MINUTE);
+
+                                // Launch Time Picker Dialog
+                                TimePickerDialog timePickerDialog = new TimePickerDialog(AdminActivity.this,
+                                        new TimePickerDialog.OnTimeSetListener() {
+
+                                            @Override
+                                            public void onTimeSet(TimePicker view, int hourOfDay,
+                                                                  int minute) {
+
+                                                txtTime.setText(hourOfDay + ":" + (minute < 10 ? "0" + minute : minute));
+                                            }
+                                        }, mHour, mMinute, true);
+                                timePickerDialog.show();
+                            }
+                        });
+                        btnCreateParty.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                if (edit_party.getText().toString().trim().isEmpty()) {
+                                    Toast.makeText(AdminActivity.this, "Bitte einen Partynamen ageben", Toast.LENGTH_SHORT);
+                                    return;
+                                }
+                                final AlertDialog.Builder builder2 = new AlertDialog.Builder(AdminActivity.this);
+                                alert2 = builder2.create();
+                                alert.dismiss();
+                                builder2.setMessage("Möchten Sie am " + txtDate.getText().toString() + " um " + txtTime.getText().toString() +
+                                        " die Party " + edit_party.getText().toString() + " bei " + infoWindowData.getVerbindung() + " planen");
+                                builder2.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final String party_name = edit_party.getText().toString();
+                                        final String party_date = txtDate.getText().toString();
+                                        final String party_time = txtTime.getText().toString();
+
+                                        //in interne Datenbank einfügen
+                                        SyncInsertTask1 syncInsertTask1 = new SyncInsertTask1();
+                                        Object result;
+                                        try {
+                                            result = syncInsertTask1.execute(infoWindowData.getId(), party_name, party_date, party_time).get();
+                                        } catch (ExecutionException e) {
+                                            e.printStackTrace();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
                                         }
+
+
+                                        SyncInsertTask2 syncInsertTask2 = new SyncInsertTask2();
+                                        syncInsertTask2.execute(infoWindowData.getId(), party_name, party_date, party_time);
+
+                                        if (infoWindowData.getPartys().size() < 1) {
+                                            infoWindowData.addParty(party_name);
+                                            infoWindowData.addDateParty(party_date);
+                                            infoWindowData.addTimeParty(party_time);
+                                        } else {
+                                            int index = infoWindowData.addDateParty(party_date, true);
+                                            infoWindowData.addParty(party_name, index);
+                                            infoWindowData.addTimeParty(party_time, index);
+                                            for (int i = 0; i < index; i++) {
+                                                infoWindowData.refresh();
+                                            }
+                                        }
+                                        marker.hideInfoWindow();
+                                        marker.setTag(infoWindowData);
+                                        marker.showInfoWindow();
+
+
+                                        alert2.cancel();
                                     }
-                                    marker.hideInfoWindow();
-                                    marker.setTag(infoWindowData);
-                                    marker.showInfoWindow();
+                                });
+                                builder2.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(AdminActivity.this, "Party nicht erstellt", Toast.LENGTH_SHORT).show();
+                                        alert.show();
+                                    }
+                                });
+                                alert2 = builder2.create();
+                                alert2.show();
 
-
-                                    alert2.cancel();
-                                }
-                            });
-                            builder2.setNegativeButton("Nein", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(AdminActivity.this,"Party nicht erstellt",Toast.LENGTH_SHORT).show();
-                                    alert.show();
-                                }
-                            });
-                            alert2 = builder2.create();
-                            alert2.show();
-
-                        }
-                    });
-                    btnCancelParty.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alert.cancel();
-                        }
-                    });
-                    builder.setView(view);
-                    alert=builder.create();
-                    alert.show();
-
+                            }
+                        });
+                        btnCancelParty.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alert.cancel();
+                            }
+                        });
+                        builder.setView(view);
+                        alert = builder.create();
+                        alert.show();
+                    }else{
+                        Toast.makeText(AdminActivity.this,"Du hast keine Berechtigung bei "+infoWindowData.getVerbindung()+" eine Party zu erstellen",Toast.LENGTH_LONG).show();
+                    }
 
                 }
             });
@@ -443,103 +478,60 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
     }
 
     class SyncTask extends AsyncTask<String, Integer, String> {
-        private String DB_URL;
-        private String USER;
-        private String PASS;
-        private InputStream in_user;
-        private InputStream in_pass;
-        private InputStream in_url;
-        private PreparedStatement preparedStatement;
-        private String statement;
-        private ResultSet rs;
-        private ResultSet rs1;
-        private String id;
         String msg;
 
 
         @Override
         protected String doInBackground(String... params) {
 
-            //Dateieren auslesen
-            try {
-                in_user = getAssets().open("username.txt");
-                in_pass = getAssets().open("passwort.txt");
-                in_url = getAssets().open("db_url.txt");
-                USER = new BufferedReader(new InputStreamReader(in_user)).readLine();
-                PASS = new BufferedReader(new InputStreamReader(in_pass)).readLine();
-                DB_URL = new BufferedReader(new InputStreamReader(in_url)).readLine();
-                in_pass.close();
-                in_user.close();
-                in_url.close();
-            } catch (IOException e) {
-                Log.e("User_read", "Es kann keine Daten lesen");
-                msg = "Es können keine Daten gelesen werden aus Datei";
-                return null;
-            }
-
-            //Party-Standorte auslesen
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);//Connection Object
-                if (conn == null) {
-                    msg = "Keine Verbindung zur Datenbank möglich";
-                } else {
-                    statement = "SELECT * FROM tb_nearby_p_standorte";
-                    preparedStatement = conn.prepareStatement(statement);
-                    rs = preparedStatement.executeQuery();
-                    while (rs.next()) {
-                        latitude.add(Double.parseDouble(rs.getString(3)));
-                        longitude.add(Double.parseDouble(rs.getString(4)));
-                        title.add(rs.getString(2));
-                        ids.add(rs.getString(1));
-                        id = rs.getString(1);
-                        statement = "SELECT * FROM tb_nearby_partys WHERE DATE(datum) >= DATE(NOW()) and standort_uid = ? order by DATE(datum) asc";
-                        preparedStatement = conn.prepareStatement(statement);
-                        preparedStatement.setString(1,id);
-                        rs1 = preparedStatement.executeQuery();
-                        rs1.last();
-                        if(rs1.getRow()>0){
-                            rs1.beforeFirst();
-                            while(rs1.next()){
-                                ArrayList<String> party=new ArrayList<>();
-                                party.add(id);
-                                String party_name = "";
-                                String[] party_parts = rs1.getString(3).split("_");
-                                if(party_parts.length>1){
-                                    party_name = party_parts[0];
-                                    for(int j=1;j<party_parts.length;j++){
-                                        party_name = party_name+" " +party_parts[j];
-                                    }
-                                }
-                                else{
-                                    party_name=rs1.getString(3);
-                                }
-                                party.add(party_name);
-
-                                String date_party = "";
-                                String[] date_parts = rs1.getString(4).split("-");
-                                for(int j=date_parts.length-1;j>0;j--){
-                                    date_party = date_party+date_parts[j]+".";
-                                }
-                                date_party = date_party+date_parts[0];
-                                party.add(date_party);
-
-                                String time_party = "";
-                                String[] time_parts = rs1.getString(5).split(":");
-                                time_party = time_parts[0]+":"+time_parts[1];
-                                party.add(time_party);
-
-                                partys.add(party);
+            List<CStandorte> standorte = DatabaseClient.getInstance(getApplicationContext(),getComponentName().getClassName()).
+                    getDatabase().standorteDao().getAll();
+            for(int i =0;i<standorte.size();i++){
+                ids.add(String.valueOf(standorte.get(i).getId()));
+                title.add(standorte.get(i).getTitel());
+                latitude.add(standorte.get(i).getLatitude());
+                longitude.add(standorte.get(i).getLongitude());
+                String id = String.valueOf(standorte.get(i).getId());
+                List<CPartys> party_list = DatabaseClient.getInstance(getApplicationContext(),getComponentName().getClassName()).
+                        getDatabase().partyDao().getAll(Integer.parseInt(id));
+                if(party_list.size()>0){
+                    for(int j = 0;j<party_list.size();j++) {
+                        ArrayList<String> party = new ArrayList<>();
+                        party.add(id);
+                        String party_name = "";
+                        String[] party_parts = party_list.get(j).getName().split("_");
+                        if(party_parts.length>1){
+                            party_name = party_parts[0];
+                            for(int l=1;l<party_parts.length;l++){
+                                party_name = party_name+" " +party_parts[l];
                             }
                         }
+                        else{
+                            party_name=party_list.get(j).getName();
+                        }
+                        party.add(party_name);
+                        String date_party = "";
+                        String[] date_parts = party_list.get(j).getDatum().toString().split("-");
+                        for(int l=date_parts.length-1;l>0;l--){
+                            date_party = date_party+date_parts[l]+".";
+                        }
+                        date_party = date_party+date_parts[0];
+                        party.add(date_party);
+
+                        String time_party = "";
+                        String[] time_parts = party_list.get(j).getTime().toString().split(":");
+                        time_party = time_parts[0]+":"+time_parts[1];
+                        party.add(time_party);
+
+                        partys.add(party);
+
                     }
-                    msg = "Daten von Datenbank geholt";
 
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                msg = "Fehler beim Auslesen aus der Datenbank";
+
+
             }
+            msg="Daten erfolgreich gelesen";
             return msg;
         }
 
@@ -548,7 +540,46 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    class SyncInsertTask extends AsyncTask<String, Integer, String> {
+    class SyncInsertTask1 extends AsyncTask<String, Integer, String> {
+        String msg;
+
+
+        @Override
+        protected String doInBackground(String... params) {
+            String party_id = params[0];
+            String party_name = params[1];
+            String party_date = params[2];
+            String party_time = params[3];
+
+            CPartys party =new CPartys();
+            party.setStandort_uid(party_id);
+            party.setName(party_name);
+
+            String[] date_parts = party_date.split(Pattern.quote("."));
+            party_date="";
+            for(int j=date_parts.length-1;j>0;j--){
+                party_date = party_date+date_parts[j]+"-";
+            }
+            party_date = party_date+date_parts[0];
+            party.setDatum(party_date);
+
+            party_time = party_time+":"+"00";
+            party.setTime(party_time);
+
+            DatabaseClient.getInstance(getApplicationContext(),getComponentName().getClassName()).
+                    getDatabase().partyDao().insert(party);
+
+            msg="Daten erfolgreich in interne Datenbank eingepflegt";
+
+            return msg;
+        }
+
+        protected void onPostExecute(String msg) {
+            Log.d("interne Datenbank", msg);
+        }
+    }
+
+    class SyncInsertTask2 extends AsyncTask<String, Integer, String> {
         private String DB_URL;
         private String USER;
         private String PASS;
@@ -569,6 +600,8 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
             String party_name = params[1];
             String party_date = params[2];
             String party_time = params[3];
+
+
             //Dateieren auslesen
             try {
                 in_user = getAssets().open("username.txt");

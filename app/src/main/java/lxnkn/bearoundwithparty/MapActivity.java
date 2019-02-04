@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static lxnkn.bearoundwithparty.util.constants.MAPVIEW_BUNDLE_KEY;
@@ -285,103 +286,61 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     class SyncTask extends AsyncTask<String, Integer, String> {
-        private String DB_URL;
-        private String USER;
-        private String PASS;
-        private InputStream in_user;
-        private InputStream in_pass;
-        private InputStream in_url;
-        private PreparedStatement preparedStatement;
-        private String statement;
-        private ResultSet rs;
-        private ResultSet rs1;
-        private String id;
         String msg;
 
 
         @Override
         protected String doInBackground(String... params) {
 
-            //Dateieren auslesen
-            try {
-                in_user = getAssets().open("username.txt");
-                in_pass = getAssets().open("passwort.txt");
-                in_url = getAssets().open("db_url.txt");
-                USER = new BufferedReader(new InputStreamReader(in_user)).readLine();
-                PASS = new BufferedReader(new InputStreamReader(in_pass)).readLine();
-                DB_URL = new BufferedReader(new InputStreamReader(in_url)).readLine();
-                in_pass.close();
-                in_user.close();
-                in_url.close();
-            } catch (IOException e) {
-                Log.e("User_read", "Es kann keine Daten lesen");
-                msg = "Es können keine Daten gelesen werden aus Datei";
-                return null;
-            }
-
-            //Party-Standorte auslesen
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);//Connection Object
-                if (conn == null) {
-                    msg = "Keine Verbindung zur Datenbank möglich";
-                } else {
-                    statement = "SELECT * FROM tb_nearby_p_standorte";
-                    preparedStatement = conn.prepareStatement(statement);
-                    rs = preparedStatement.executeQuery();
-                    while (rs.next()) {
-                        latitude.add(Double.parseDouble(rs.getString(3)));
-                        longitude.add(Double.parseDouble(rs.getString(4)));
-                        title.add(rs.getString(2));
-                        ids.add(rs.getString(1));
-                        id = rs.getString(1);
-                        statement = "SELECT * FROM tb_nearby_partys WHERE DATE(datum) >= DATE(NOW()) and standort_uid = ? order by DATE(datum) asc";
-                        preparedStatement = conn.prepareStatement(statement);
-                        preparedStatement.setString(1,id);
-                        rs1 = preparedStatement.executeQuery();
-                        rs1.last();
-                        if(rs1.getRow()>0){
-                            rs1.beforeFirst();
-                            while(rs1.next()){
-                                ArrayList<String> party=new ArrayList<>();
-                                party.add(id);
-                                String party_name = "";
-                                String[] party_parts = rs1.getString(3).split("_");
-                                if(party_parts.length>1){
-                                    party_name = party_parts[0];
-                                    for(int j=1;j<party_parts.length;j++){
-                                        party_name = party_name+" " +party_parts[j];
-                                    }
-                                }
-                                else{
-                                    party_name=rs1.getString(3);
-                                }
-                                party.add(party_name);
-
-                                String date_party = "";
-                                String[] date_parts = rs1.getString(4).split("-");
-                                for(int j=date_parts.length-1;j>0;j--){
-                                    date_party = date_party+date_parts[j]+".";
-                                }
-                                date_party = date_party+date_parts[0];
-                                party.add(date_party);
-
-                                String time_party = "";
-                                String[] time_parts = rs1.getString(5).split(":");
-                                time_party = time_parts[0]+":"+time_parts[1];
-                                party.add(time_party);
-
-                                partys.add(party);
+            List<CStandorte> standorte = DatabaseClient.getInstance(getApplicationContext(),getComponentName().getClassName()).
+                    getDatabase().standorteDao().getAll();
+            for(int i =0;i<standorte.size();i++){
+                ids.add(String.valueOf(standorte.get(i).getId()));
+                title.add(standorte.get(i).getTitel());
+                latitude.add(standorte.get(i).getLatitude());
+                longitude.add(standorte.get(i).getLongitude());
+                String id = String.valueOf(standorte.get(i).getId());
+                List<CPartys> party_list = DatabaseClient.getInstance(getApplicationContext(),getComponentName().getClassName()).
+                        getDatabase().partyDao().getAll(Integer.parseInt(id));
+                if(party_list.size()>0){
+                    for(int j = 0;j<party_list.size();j++) {
+                        ArrayList<String> party = new ArrayList<>();
+                        party.add(id);
+                        String party_name = "";
+                        String[] party_parts = party_list.get(j).getName().split("_");
+                        if(party_parts.length>1){
+                            party_name = party_parts[0];
+                            for(int l=1;l<party_parts.length;l++){
+                                party_name = party_name+" " +party_parts[l];
                             }
                         }
+                        else{
+                            party_name=party_list.get(j).getName();
+                        }
+                        party.add(party_name);
+                        String date_party = "";
+                        String[] date_parts = party_list.get(j).getDatum().toString().split("-");
+                        for(int l=date_parts.length-1;l>0;l--){
+                            date_party = date_party+date_parts[l]+".";
+                        }
+                        date_party = date_party+date_parts[0];
+                        party.add(date_party);
+
+                        String time_party = "";
+                        String[] time_parts = party_list.get(j).getTime().toString().split(":");
+                        time_party = time_parts[0]+":"+time_parts[1];
+                        party.add(time_party);
+
+                        partys.add(party);
+
                     }
-                    msg = "Daten von Datenbank geholt";
 
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                msg = "Fehler beim Auslesen aus der Datenbank";
+
+
             }
+            msg="Daten erfolgreich gelesen";
+
             return msg;
         }
 
