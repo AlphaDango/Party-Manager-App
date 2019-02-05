@@ -38,12 +38,21 @@ public class MenuFragment extends Fragment {
             logout.setVisible(true);
         }
         else{
-            MenuItem login = menu.findItem(R.id.login);
-            login.setVisible(true);
-            MenuItem map =menu.findItem(R.id.map);
-            map.setVisible(true);
-            MenuItem logout = menu.findItem(R.id.logout);
-            logout.setVisible(false);
+            if(getActivity().getClass().getName().equals(MapActivity.class.getName())){
+                MenuItem login = menu.findItem(R.id.login);
+                login.setVisible(true);
+                MenuItem map = menu.findItem(R.id.map);
+                map.setVisible(false);
+                MenuItem logout = menu.findItem(R.id.logout);
+                logout.setVisible(false);
+            }else{
+                MenuItem login = menu.findItem(R.id.login);
+                login.setVisible(false);
+                MenuItem map =menu.findItem(R.id.map);
+                map.setVisible(true);
+                MenuItem logout = menu.findItem(R.id.logout);
+                logout.setVisible(false);
+            }
         }
     }
 
