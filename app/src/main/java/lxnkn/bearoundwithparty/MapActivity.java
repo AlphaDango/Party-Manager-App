@@ -285,6 +285,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMapView.onLowMemory();
     }
 
+    @Override
+    public void onBackPressed(){
+        this.finishAffinity();
+    }
+
     class SyncTask extends AsyncTask<String, Integer, String> {
         String msg;
 

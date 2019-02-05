@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public interface IPartysDao {
-    @Query("select * from CPartys WHERE standort_uid = (:standort_uid) order by Date(datum) asc")
+    @Query("select * from CPartys WHERE standort_uid = (:standort_uid) order by datum asc")
     List<CPartys> getAll(int standort_uid);
 
     @Insert

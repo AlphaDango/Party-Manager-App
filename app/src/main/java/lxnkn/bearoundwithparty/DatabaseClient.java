@@ -41,10 +41,11 @@ public class DatabaseClient {
     public static synchronized DatabaseClient getInstance(Context mCtx, String activityName) {
 
         if (mInstance == null || activityName.equals(MainActivity.class.getName())) {
-            if(mInstance != null){
-                database.partyDao().delete();
-                database.standorteDao().delete();
-            }
+
+            database = Room.databaseBuilder(mCtx,Database_bearound.class,"Database_bearound").build();
+            database.partyDao().delete();
+            database.standorteDao().delete();
+
 
             try {
                 in_user = mCtx.getAssets().open("username.txt");
@@ -74,6 +75,7 @@ public class DatabaseClient {
                     rs = preparedStatement.executeQuery();
                     while(rs.next()){
                         CStandorte standort = new CStandorte();
+                        standort.setId(Integer.parseInt(rs.getString(1)));
                         standort.setTitel(rs.getString(2));
                         standort.setLatitude(rs.getString(3));
                         standort.setLongitude(rs.getString(4));
