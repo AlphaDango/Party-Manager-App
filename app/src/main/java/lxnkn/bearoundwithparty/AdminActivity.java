@@ -317,7 +317,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                                             public void onDateSet(DatePicker view, int year,
                                                                   int monthOfYear, int dayOfMonth) {
 
-                                                txtDate.setText(((dayOfMonth + 1) < 10 ? "0" + (dayOfMonth) : (dayOfMonth)) + "." + ((monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : (monthOfYear + 1)) + "." + year);
+                                                txtDate.setText((dayOfMonth < 10 ? "0" + (dayOfMonth) : (dayOfMonth)) + "." + ((monthOfYear + 1) < 10 ? "0" + (monthOfYear + 1) : (monthOfYear + 1)) + "." + year);
 
                                             }
                                         }, mYear, mMonth, mDay);
@@ -361,7 +361,7 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
                                 alert2 = builder2.create();
                                 alert.dismiss();
                                 builder2.setMessage("Möchten Sie am " + txtDate.getText().toString() + " um " + txtTime.getText().toString() +
-                                        " die Party " + edit_party.getText().toString() + " bei " + infoWindowData.getVerbindung() + " planen");
+                                        " Uhr die Party " + edit_party.getText().toString() + " bei " + infoWindowData.getVerbindung() + " planen");
                                 builder2.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
