@@ -90,6 +90,8 @@ public class AdminActivity extends AppCompatActivity implements OnMapReadyCallba
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }else{
+            Toast.makeText(getApplicationContext(), "Länger auf Veranstaltungsort klicken um Party zu erstellen!",
+                    Toast.LENGTH_LONG).show();
             Intent intent = getIntent();
             String right_string = intent.getStringExtra("Rights");
             if(!right_string.isEmpty()) {
