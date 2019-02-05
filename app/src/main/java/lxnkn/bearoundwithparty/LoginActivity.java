@@ -1,6 +1,7 @@
 package lxnkn.bearoundwithparty;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_login);
         anmeldungButton = findViewById(R.id.anmeldungButton);
         benutzernamenFeld = findViewById(R.id.benutzernamenFeld);
